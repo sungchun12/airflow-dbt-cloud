@@ -45,9 +45,6 @@ Create a dbt Cloud API token:
 Add your dbt Cloud API token as an encrypted variable:
 ![image](/images/airflow_api_token_variable.png)
 
-Turn on the DAG:
-![image](/images/turn_on_dag.png)
-
 Add your job config details to the python file: [dbt_cloud_example.py](/dags/dbt_cloud_example.py)
 
 ```python
@@ -60,6 +57,9 @@ dbt_cloud_job_runner_config = dbt_cloud_job_runner(
 )
 
 ```
+
+Turn on the DAG:
+![image](/images/turn_on_dag.png)
 
 Verify the job succeeded after running:
 ![image](/images/verify_job_success.png)
