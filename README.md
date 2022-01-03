@@ -12,6 +12,8 @@ Examples of scheduling dbt Cloud pipelines in airflow. This is intended to be th
 
 Create a dbt Cloud job: [here](https://docs.getdbt.com/docs/dbt-cloud/cloud-quickstart/#create-a-new-job)
 
+Download and turn on docker desktop: [here](https://docs.docker.com/desktop/mac/install/)
+
 Run the following command to start a local airflow deployment:
 
 ```bash
@@ -62,7 +64,6 @@ dbt_cloud_job_runner_config = dbt_cloud_job_runner(
 Verify the job succeeded after running:
 ![image](/images/verify_job_success.png)
 ![image](/images/verify_dbt_cloud_job_success.png)
-
 
 Run the following command to stop a local airflow deployment:
 
