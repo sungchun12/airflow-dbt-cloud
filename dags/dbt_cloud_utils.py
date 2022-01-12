@@ -1,4 +1,5 @@
 import time
+import json
 
 import requests
 from dataclasses import dataclass
@@ -57,22 +58,21 @@ class dbt_cloud_job_runner(dbt_cloud_job_vars, dbt_job_run_status):
             job_run_id(int): specific dbt Cloud job run id invoked
         """
         url = f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/jobs/{self.job_id}/run/"
-        headers = {"Authorization": f"Token {self.dbt_cloud_api_key}"}
-        res = requests.post(
-            url=url,
-            headers=headers,
-            data={
-                "cause": f"{self.cause}",  # name of the python file invoking this
-            },
-        )
-
-        try:
-            res.raise_for_status()
-        except:
-            print(f"API token (last four): ...{self.dbt_cloud_api_key[-4:]}")
-            raise
+        headers = {
+            "Authorization": f"Token {self.dbt_cloud_api_key}",
+            "Content-type": "application/json",
+        }
+        params = {
+            "cause": f"{self.cause}",  # name of the python file invoking this
+            # "generate_docs_override": True,
+            # "threads_override": 24,
+        }
+        payload = json.dumps(params)
+        print(payload)
+        res = requests.post(url=url, headers=headers, data=payload)
 
         response_payload = res.json()
+
         # Verify the dbt Cloud job matches the arguments passed
         assert self.account_id == response_payload["data"]["account_id"]
         assert self.project_id == response_payload["data"]["project_id"]
