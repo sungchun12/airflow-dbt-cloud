@@ -34,6 +34,7 @@ with DAG(
     # have a separate extract and load process(think: FivetranOperator and/or custom gcs load to bigquery tasks)
     extract = DummyOperator(task_id="extract")
     load = DummyOperator(task_id="load")
+    ml_training = DummyOperator(task_id="ml_training")
 
     # Single task to execute dbt Cloud job and track status over time
     transform = PythonOperator(
@@ -42,4 +43,4 @@ with DAG(
         provide_context=True,
     )
 
-    extract >> load >> transform
+    extract >> load >> transform >> ml_training
