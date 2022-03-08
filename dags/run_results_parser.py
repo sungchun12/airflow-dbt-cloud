@@ -9,8 +9,8 @@ import json
 
 # concatenate output string 
 # example: dbt build --select abc def xyz
-with open("/Users/sung/Desktop/airflow-dbt-cloud/dags/run_results.json") as f:
-    run_results = json.load(f)
+# with open("/Users/sung/Desktop/airflow-dbt-cloud/dags/run_results.json") as f:
+#     run_results = json.load(f)
 
 status_set = {'error','fail','warn'}
 
@@ -21,24 +21,26 @@ run_downstream_nodes = True
 
 # TODO: figure out what data type the get artifact operator outputs: string, json, dict, etc
 class dbt_command_run_results_parser:
-    def __init__(self, run_results, status_set, dbt_command_override, run_downstream_nodes):
-        self.run_results = run_results
+    def __init__(self, status_set, dbt_command_override, run_downstream_nodes):
+        # self.run_results = run_results
         self.status_set = status_set # ex: {'warn', 'error', 'fail'}
         self.dbt_command_override = dbt_command_override 
         self.run_downstream_nodes = run_downstream_nodes
 
-    def get_dbt_command_output(self) -> str:
-        filtered_run_results_set = self.filter_run_results_dict_by_status()
+    def get_dbt_command_output(self, run_results) -> str:
+        run_results_dict = self.get_run_results_to_dict(run_results)
+        filtered_run_results_set = self.filter_run_results_dict_by_status(run_results_dict)
         dbt_command_output = self.parse_run_results_to_dbt_command(filtered_run_results_set)
         return dbt_command_output
 
-    def get_run_results_to_dict(self) -> dict:
-        run_results_dict = json.load(self.run_results)
+    def get_run_results_to_dict(self, run_results) -> dict:
+        with open(run_results) as f:
+            run_results_dict = json.load(f)
         return run_results_dict
     
-    def filter_run_results_dict_by_status(self) -> set:
+    def filter_run_results_dict_by_status(self, run_results_dict) -> set:
         filtered_run_results_set = set()
-        run_results_models = self.run_results.get('results')
+        run_results_models = run_results_dict.get('results')
         for model in run_results_models:
             if model.get('status') in self.status_set:
                 filtered_model_id = model.get('unique_id')
@@ -60,6 +62,6 @@ class dbt_command_run_results_parser:
                 dbt_command_output += model + ' '
         return dbt_command_output
 
-dbt_command_output = dbt_command_run_results_parser(run_results,status_set,dbt_command_override,run_downstream_nodes)
+# dbt_command_output = dbt_command_run_results_parser(run_results,status_set,dbt_command_override,run_downstream_nodes)
 
-print(dbt_command_output.get_dbt_command_output())
+# print(dbt_command_output.get_dbt_command_output())
