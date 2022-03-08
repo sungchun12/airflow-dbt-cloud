@@ -39,7 +39,7 @@ with DAG(
     # [START howto_operator_dbt_cloud_run_job]
     trigger_job_run = DbtCloudRunJobOperator(
         task_id="trigger_job_run",
-        job_id=30605,
+        job_id=65767,
         check_interval=10,
         timeout=300,
     )
@@ -50,6 +50,10 @@ with DAG(
         task_id="get_run_results_artifact", run_id=trigger_job_run.output, path="run_results.json"
     )
     # [END howto_operator_dbt_cloud_get_artifact]
+    # TODO: add in a way to read in the run_results.json file and check for errors
+    # TODO: add in a task to parse the run_results.json and compile the dbt command with hard coded models(xcom push)
+    # TODO: add a task to run the compiled dbt command(via xcom pull)
+    # TODO: add in a way to use `dbt build --select result:error+ --defer --state <path of run_results.json>`
 
     begin >> Label("No async wait") >> trigger_job_run
     [get_run_results_artifact] >> end
