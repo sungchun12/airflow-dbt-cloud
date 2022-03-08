@@ -37,7 +37,7 @@ class dbt_command_run_results_parser:
 
     def parse_run_results_to_dbt_command(self, filtered_run_results_set) -> str:
         dbt_command_output = f"{self.dbt_command_override} --select "
-        if run_downstream_nodes == True:
+        if self.run_downstream_nodes == True:
             for model in filtered_run_results_set:
                 dbt_command_output += model + '+ '
         else:

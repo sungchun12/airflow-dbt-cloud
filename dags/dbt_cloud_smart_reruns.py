@@ -37,9 +37,10 @@ dbt_command_override = "dbt build"
 
 run_downstream_nodes = True
 
+run_id = 46948860
+
 dbt_command_generator = dbt_command_run_results_parser(status_set,dbt_command_override,run_downstream_nodes)
 
-run_id = 46948860
 
 def _get_dbt_command_xcom(ti):
     ti.xcom_pull(key='return_value', task_id="parse_run_results_to_dbt_command")
