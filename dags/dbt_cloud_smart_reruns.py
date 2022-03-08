@@ -38,7 +38,11 @@ dbt_command_override = "dbt build"
 run_downstream_nodes = True
 
 dbt_command_generator = dbt_command_run_results_parser(status_set,dbt_command_override,run_downstream_nodes)
+
 run_id = 46948860
+
+def _get_dbt_command_xcom(ti):
+    ti.xcom_pull(key='return_value', task_id="parse_run_results_to_dbt_command")
 
 with DAG(
     dag_id="dbt_cloud_smart_reruns",
@@ -50,33 +54,25 @@ with DAG(
     begin = DummyOperator(task_id="begin")
     end = DummyOperator(task_id="end")
 
-    # [START howto_operator_dbt_cloud_get_artifact]
     get_run_results_artifact = DbtCloudGetJobRunArtifactOperator(
         task_id="get_run_results_artifact", run_id=run_id, path="run_results.json"
     )
-    # [END howto_operator_dbt_cloud_get_artifact]
-    # TODO: add in a way to read in the run_results.json file and check for errors
-    # TODO: add in a task to parse the run_results.json and compile the dbt command with hard coded models(xcom push)
-    # TODO: add a task to run the compiled dbt command(via xcom pull)
 
     parse_run_results_to_dbt_command = PythonOperator(
         task_id="parse_run_results_to_dbt_command",
         python_callable=dbt_command_generator.get_dbt_command_output,
-        op_kwargs={"run_results": '46948860_run_results.json'},
+        op_kwargs={"run_results": get_run_results_artifact.output_file_name},
         provide_context=True,
     )
 
     # TODO: add dbt command steps override config based on parsed command in previous step
-    # [START howto_operator_dbt_cloud_run_job]
     trigger_job_smart_rerun = DbtCloudRunJobOperator(
-        task_id="trigger_job_run",
+        task_id="trigger_job_smart_rerun",
         additional_run_config={"steps_override": ["dbt run --select my_first_model"]},
         job_id=65767,
         check_interval=10,
         timeout=300,
     )
-    # [END howto_operator_dbt_cloud_run_job]
 
 
     begin >> get_run_results_artifact >> parse_run_results_to_dbt_command >> trigger_job_smart_rerun >> end
-

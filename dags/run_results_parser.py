@@ -2,24 +2,7 @@
 
 import json
 
-# read in the json file into a dictionary
 
-
-# filter the dictionary for models with the relevant status, functions like either/or criteria:pass, warn, error, fail, etc.
-
-# concatenate output string 
-# example: dbt build --select abc def xyz
-# with open("/Users/sung/Desktop/airflow-dbt-cloud/dags/run_results.json") as f:
-#     run_results = json.load(f)
-
-status_set = {'error','fail','warn'}
-
-dbt_command_override = "dbt build"
-
-run_downstream_nodes = True
-
-
-# TODO: figure out what data type the get artifact operator outputs: string, json, dict, etc
 class dbt_command_run_results_parser:
     def __init__(self, status_set, dbt_command_override, run_downstream_nodes):
         # self.run_results = run_results
@@ -61,7 +44,3 @@ class dbt_command_run_results_parser:
             for model in filtered_run_results_set:
                 dbt_command_output += model + ' '
         return dbt_command_output
-
-# dbt_command_output = dbt_command_run_results_parser(run_results,status_set,dbt_command_override,run_downstream_nodes)
-
-# print(dbt_command_output.get_dbt_command_output())
