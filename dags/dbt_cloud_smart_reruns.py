@@ -19,12 +19,17 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.dummy import DummyOperator
+from airflow.operators.python_operator import PythonOperator
+
 from airflow.providers.dbt.cloud.operators.dbt import (
     DbtCloudGetJobRunArtifactOperator,
     DbtCloudRunJobOperator,
 )
-from airflow.providers.dbt.cloud.sensors.dbt import DbtCloudJobRunSensor
-from airflow.utils.edgemodifier import Label
+from run_results_parser import dbt_cloud_job_runner
+
+
+#TODO: add ability to trigger with config
+# To access configuration in your DAG use {{ dag_run.conf }}. As core.dag_run_conf_overrides_params is set to True, so passing any configuration here will override task params which can be accessed via {{ params }}.
 
 with DAG(
     dag_id="dbt_cloud_smart_reruns",
@@ -36,15 +41,6 @@ with DAG(
     begin = DummyOperator(task_id="begin")
     end = DummyOperator(task_id="end")
 
-    # [START howto_operator_dbt_cloud_run_job]
-    trigger_job_run = DbtCloudRunJobOperator(
-        task_id="trigger_job_run",
-        job_id=65767,
-        check_interval=10,
-        timeout=300,
-    )
-    # [END howto_operator_dbt_cloud_run_job]
-
     # [START howto_operator_dbt_cloud_get_artifact]
     get_run_results_artifact = DbtCloudGetJobRunArtifactOperator(
         task_id="get_run_results_artifact", run_id=trigger_job_run.output, path="run_results.json"
@@ -55,9 +51,22 @@ with DAG(
     # TODO: add a task to run the compiled dbt command(via xcom pull)
     # TODO: add in a way to use `dbt build --select result:error+ --defer --state <path of run_results.json>`
 
-    begin >> Label("No async wait") >> trigger_job_run
-    [get_run_results_artifact] >> end
+    # parse_run_results_to_dbt_command = PythonOperator(
+    #     task_id="parse_run_results_to_dbt_command",
+    #     python_callable=dbt_cloud_job_runner_config.run_job,
+    #     provide_context=True,
+    # )
 
-    # Task dependency created via `XComArgs`:
-    # trigger_job_run1 >> get_run_results_artifact
-    # trigger_job_run2 >> job_run_sensor
+    # TODO: add dbt command steps override config based on parsed command in previous step
+    # [START howto_operator_dbt_cloud_run_job]
+    trigger_job_run = DbtCloudRunJobOperator(
+        task_id="trigger_job_run",
+        job_id=65767,
+        check_interval=10,
+        timeout=300,
+    )
+    # [END howto_operator_dbt_cloud_run_job]
+
+
+    begin >> get_run_results_artifact >> end
+
