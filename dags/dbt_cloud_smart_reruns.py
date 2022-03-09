@@ -43,27 +43,11 @@ class dbt_cloud_job_rerun_vars:
     run_downstream_nodes: bool = Variable.get("run_downstream_nodes") # True
 
 
-# status_str = "{{ dag_run.conf['status_set'] }}"
-# # status_set = set(status_str) # {'error','fail','warn'}
-# status_set = {"error", "fail", "warn"}
-
-# # dbt_command_override = "{{ dag_run.conf['dbt_command_override'] }}" # "dbt build"
-# dbt_command_override = "{{ params.dbt_command_override }}"  # "dbt build"
-
-# run_downstream_nodes = "{{ dag_run.conf['run_downstream_nodes'] }}"  # True
-
-# # this works because it's already a templated field
-# run_id = "{{ dag_run.conf['run_id'] }}"  # 46948860
-
 dbt_command_generator = dbt_command_run_results_parser(
     dbt_cloud_job_rerun_vars.status_set,
     dbt_cloud_job_rerun_vars.dbt_command_override,
     dbt_cloud_job_rerun_vars.run_downstream_nodes,
 )
-
-
-def _get_dbt_command_xcom(ti):
-    ti.xcom_pull(key="return_value", task_id="parse_run_results_to_dbt_command")
 
 
 with DAG(
