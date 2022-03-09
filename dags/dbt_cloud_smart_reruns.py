@@ -67,9 +67,11 @@ with DAG(
     )
 
     # TODO: add dbt command steps override config based on parsed command in previous step
+    # xcom_pull = "{{ task_instance.xcom_pull(task_ids='parse_run_results_to_dbt_command',key='return_value') }}"
     trigger_job_smart_rerun = DbtCloudRunJobOperator(
         task_id="trigger_job_smart_rerun",
-        additional_run_config={"steps_override": ["dbt run --select my_first_model"]},
+        steps_override=["dbt run --select my_first_model"], # does NOT work 
+        # additional_run_config={"steps_override": [xcom_pull]}, # works correctly
         job_id=65767,
         check_interval=10,
         timeout=300,
