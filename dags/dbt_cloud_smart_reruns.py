@@ -37,10 +37,10 @@ class dbt_cloud_job_rerun_vars:
     """Basic dbt Cloud job rerun configurations."""
 
     # add type hints
-    run_id: int = Variable.get("run_id") # 46948860
-    status_set: set = Variable.get("status_set") # {'error','fail','warn'}
-    dbt_command_override: Str = Variable.get("dbt_command_override") # "dbt build"
-    run_downstream_nodes: bool = Variable.get("run_downstream_nodes") # True
+    run_id: int = Variable.get("run_id")  # 46948860
+    status_set: set = Variable.get("status_set")  # {'error','fail','warn'}
+    dbt_command_override: str = Variable.get("dbt_command_override")  # "dbt build"
+    run_downstream_nodes: bool = Variable.get("run_downstream_nodes")  # True
 
 
 dbt_command_generator = dbt_command_run_results_parser(
@@ -61,7 +61,9 @@ with DAG(
     end = DummyOperator(task_id="end")
 
     get_run_results_artifact = DbtCloudGetJobRunArtifactOperator(
-        task_id="get_run_results_artifact", run_id=dbt_cloud_job_rerun_vars.run_id, path="run_results.json"
+        task_id="get_run_results_artifact",
+        run_id=dbt_cloud_job_rerun_vars.run_id,
+        path="run_results.json",
     )
 
     parse_run_results_to_dbt_command = PythonOperator(
