@@ -40,7 +40,7 @@ class dbt_cloud_job_rerun_vars:
     run_id: int = Variable.get("run_id")  # 46948860
     status_set: set = Variable.get("status_set")  # {'error','fail','warn'}
     dbt_command_override: str = Variable.get("dbt_command_override")  # "dbt build"
-    run_downstream_nodes: bool = Variable.get("run_downstream_nodes")  # True
+    run_downstream_nodes: bool = bool(Variable.get("run_downstream_nodes"))  # True
 
 
 dbt_command_generator = dbt_command_run_results_parser(
