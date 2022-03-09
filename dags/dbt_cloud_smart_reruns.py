@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from ast import Str
+
 from datetime import datetime
 from dataclasses import dataclass
 
