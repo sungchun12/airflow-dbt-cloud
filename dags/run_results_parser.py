@@ -5,7 +5,6 @@ import json
 
 class dbt_command_run_results_parser:
     def __init__(self, status_set, dbt_command_override, run_downstream_nodes):
-        # self.run_results = run_results
         self.status_set = status_set # ex: {'warn', 'error', 'fail'}
         self.dbt_command_override = dbt_command_override 
         self.run_downstream_nodes = run_downstream_nodes
