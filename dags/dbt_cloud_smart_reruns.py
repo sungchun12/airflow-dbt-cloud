@@ -15,11 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
+from ast import Str
 from datetime import datetime
+from dataclasses import dataclass
 
 from airflow.models import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python_operator import PythonOperator
+from airflow.models import Variable
 
 from airflow.providers.dbt.cloud.operators.dbt import (
     DbtCloudGetJobRunArtifactOperator,
@@ -28,22 +31,40 @@ from airflow.providers.dbt.cloud.operators.dbt import (
 from run_results_parser import dbt_command_run_results_parser
 
 
-#TODO: add ability to trigger with config
-# To access configuration in your DAG use {{ dag_run.conf }}. As core.dag_run_conf_overrides_params is set to True, so passing any configuration here will override task params which can be accessed via {{ params }}.
+# TODO: manually set these variables in the airflow variables UI
+@dataclass(frozen=True)  # make attributes immutable
+class dbt_cloud_job_rerun_vars:
+    """Basic dbt Cloud job rerun configurations."""
 
-status_set = {'error','fail','warn'}
+    # add type hints
+    run_id: int = Variable.get("run_id") # 46948860
+    status_set: set = Variable.get("status_set") # {'error','fail','warn'}
+    dbt_command_override: Str = Variable.get("dbt_command_override") # "dbt build"
+    run_downstream_nodes: bool = Variable.get("run_downstream_nodes") # True
 
-dbt_command_override = "dbt build"
 
-run_downstream_nodes = True
+# status_str = "{{ dag_run.conf['status_set'] }}"
+# # status_set = set(status_str) # {'error','fail','warn'}
+# status_set = {"error", "fail", "warn"}
 
-run_id = 46948860
+# # dbt_command_override = "{{ dag_run.conf['dbt_command_override'] }}" # "dbt build"
+# dbt_command_override = "{{ params.dbt_command_override }}"  # "dbt build"
 
-dbt_command_generator = dbt_command_run_results_parser(status_set,dbt_command_override,run_downstream_nodes)
+# run_downstream_nodes = "{{ dag_run.conf['run_downstream_nodes'] }}"  # True
+
+# # this works because it's already a templated field
+# run_id = "{{ dag_run.conf['run_id'] }}"  # 46948860
+
+dbt_command_generator = dbt_command_run_results_parser(
+    dbt_cloud_job_rerun_vars.status_set,
+    dbt_cloud_job_rerun_vars.dbt_command_override,
+    dbt_cloud_job_rerun_vars.run_downstream_nodes,
+)
 
 
 def _get_dbt_command_xcom(ti):
-    ti.xcom_pull(key='return_value', task_id="parse_run_results_to_dbt_command")
+    ti.xcom_pull(key="return_value", task_id="parse_run_results_to_dbt_command")
+
 
 with DAG(
     dag_id="dbt_cloud_smart_reruns",
@@ -56,7 +77,7 @@ with DAG(
     end = DummyOperator(task_id="end")
 
     get_run_results_artifact = DbtCloudGetJobRunArtifactOperator(
-        task_id="get_run_results_artifact", run_id=run_id, path="run_results.json"
+        task_id="get_run_results_artifact", run_id=dbt_cloud_job_rerun_vars.run_id, path="run_results.json"
     )
 
     parse_run_results_to_dbt_command = PythonOperator(
@@ -70,12 +91,19 @@ with DAG(
     # xcom_pull = "{{ task_instance.xcom_pull(task_ids='parse_run_results_to_dbt_command',key='return_value') }}"
     trigger_job_smart_rerun = DbtCloudRunJobOperator(
         task_id="trigger_job_smart_rerun",
-        steps_override=["dbt run --select my_first_model"], # does NOT work 
-        # additional_run_config={"steps_override": [xcom_pull]}, # works correctly
+        # steps_override=["dbt run --select my_first_model"], # does NOT work
+        additional_run_config={
+            "steps_override": ["dbt run --select my_first_model"]
+        },  # works correctly
         job_id=65767,
         check_interval=10,
         timeout=300,
     )
 
-
-    begin >> get_run_results_artifact >> parse_run_results_to_dbt_command >> trigger_job_smart_rerun >> end
+    (
+        begin
+        >> get_run_results_artifact
+        >> parse_run_results_to_dbt_command
+        >> trigger_job_smart_rerun
+        >> end
+    )
