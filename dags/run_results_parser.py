@@ -1,4 +1,4 @@
-"""Utilities to parse the results of the run_results.json script."""
+"""Utilities to parse the results of the run_results.json"""
 
 import json
 
