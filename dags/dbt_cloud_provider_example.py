@@ -54,7 +54,7 @@ with DAG(
     # [START howto_operator_dbt_cloud_run_job_async]
     trigger_job_run2 = DbtCloudRunJobOperator(
         task_id="trigger_job_run2",
-        job_id=30605,
+        job_id=65767,
         wait_for_termination=False,
         additional_run_config={"threads_override": 8},
     )
@@ -62,7 +62,7 @@ with DAG(
 
     # [START howto_operator_dbt_cloud_run_job_sensor]
     job_run_sensor = DbtCloudJobRunSensor(
-        task_id="job_run_sensor", run_id=trigger_job_run2.output, timeout=20
+        task_id="job_run_sensor", run_id=trigger_job_run2.output, timeout=600
     )
     # [END howto_operator_dbt_cloud_run_job_sensor]
 
