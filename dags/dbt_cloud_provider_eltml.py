@@ -34,7 +34,6 @@ with DAG(
     load = DummyOperator(task_id="load")
     ml_training = DummyOperator(task_id="ml_training")
 
-    # [START howto_operator_dbt_cloud_run_job]
     trigger_dbt_cloud_job_run = DbtCloudRunJobOperator(
         task_id="trigger_dbt_cloud_job_run",
         job_id=65767,
