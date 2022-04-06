@@ -96,7 +96,7 @@ dbt_cloud_job_runner_config = dbt_cloud_job_runner(
 
 ```
 dbt_cloud_job_runner_config = dbt_cloud_job_runner(
-    single_tenant = 'customer', account_id=16173, project_id=36467, job_id=30605, cause=dag_file_name
+    single_tenant = 'customer', account_id=19, project_id=37, job_id=28, cause=dag_file_name
 )
 ```
 
