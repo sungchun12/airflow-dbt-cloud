@@ -29,7 +29,7 @@ default_args = {
 
 
 with DAG(
-    "dbt_cloud_example", default_args=default_args, schedule_interval="@once"
+    "dbt_cloud_example_single_tenant", default_args=default_args, schedule_interval="@once"
 ) as dag:
     # have a separate extract and load process(think: FivetranOperator and/or custom gcs load to bigquery tasks)
     extract = DummyOperator(task_id="extract")
