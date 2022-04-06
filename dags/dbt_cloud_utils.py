@@ -17,9 +17,14 @@ class dbt_cloud_job_vars:
     project_id: int
     job_id: int
     cause: str
+    single_tenant: str = None
     dbt_cloud_api_key: str = Variable.get(
         "dbt_cloud_api_key"
-    )  # TODO: manually set this in the airflow variables UI
+    )  # TODO: manually set this in the airflow variables UI 
+
+    @property
+    def dbt_cloud_url(self):
+        return "https://cloud.getdbt.com" if self.single_tenant is None else f"https://{self.single_tenant}.getdbt.com"
 
 
 @dataclass(frozen=True)
@@ -45,6 +50,7 @@ class dbt_cloud_job_runner(dbt_cloud_job_vars, dbt_job_run_status):
         project_id(int): dbt Cloud project id
         job_id(int): dbt Cloud job id
         cause(str): dbt Cloud cause(ex: name of DAG)
+        single_tenant(str): dbt Cloud single tenant subdomain(s) (optional)
         dbt_cloud_api_key(str)(OPTIONAL): dbt Cloud api key to authorize programmatically interacting with dbt Cloud
     """
 
@@ -57,7 +63,7 @@ class dbt_cloud_job_runner(dbt_cloud_job_vars, dbt_job_run_status):
         ----------
             job_run_id(int): specific dbt Cloud job run id invoked
         """
-        url = f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/jobs/{self.job_id}/run/"
+        url = f"{self.dbt_cloud_url}/api/v2/accounts/{self.account_id}/jobs/{self.job_id}/run/"
         headers = {
             "Authorization": f"Token {self.dbt_cloud_api_key}",
             "Content-type": "application/json",
@@ -70,7 +76,6 @@ class dbt_cloud_job_runner(dbt_cloud_job_vars, dbt_job_run_status):
         payload = json.dumps(params)
         print(payload)
         res = requests.post(url=url, headers=headers, data=payload)
-
         response_payload = res.json()
 
         # Verify the dbt Cloud job matches the arguments passed
@@ -95,7 +100,7 @@ class dbt_cloud_job_runner(dbt_cloud_job_vars, dbt_job_run_status):
         ----------
             job_run_status(int): status of the dbt Cloud job run
         """
-        url = f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/runs/{job_run_id}/"
+        url = f"{self.dbt_cloud_url}/api/v2/accounts/{self.account_id}/runs/{job_run_id}/"
         headers = {"Authorization": f"Token {self.dbt_cloud_api_key}"}
         res = requests.get(url=url, headers=headers)
 
@@ -110,7 +115,7 @@ class dbt_cloud_job_runner(dbt_cloud_job_vars, dbt_job_run_status):
         job_run_id = self._trigger_job()
         print(f"job_run_id = {job_run_id}")
 
-        visit_url = f"https://cloud.getdbt.com/#/accounts/{self.account_id}/projects/{self.project_id}/runs/{job_run_id}/"
+        visit_url = f"{self.dbt_cloud_url}/#/accounts/{self.account_id}/projects/{self.project_id}/runs/{job_run_id}/"
         print(f"Check the dbt Cloud job status! Visit URL:{visit_url}")
 
         while True:

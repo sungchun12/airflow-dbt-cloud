@@ -92,6 +92,14 @@ dbt_cloud_job_runner_config = dbt_cloud_job_runner(
 
 ```
 
+> :exclamation: **If you are on a [Single Tenant](https://docs.getdbt.com/docs/dbt-cloud/deployments/deployment-overview) instance of dbt Cloud:** Add the optional parameter `single_tenant` with your single tenant subdomain(s). For example:
+
+```
+dbt_cloud_job_runner_config = dbt_cloud_job_runner(
+    single_tenant = 'customer', account_id=16173, project_id=36467, job_id=30605, cause=dag_file_name
+)
+```
+
 Turn on the DAG:
 ![image](/images/turn_on_dag.png)
 
