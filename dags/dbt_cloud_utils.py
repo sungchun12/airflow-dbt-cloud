@@ -17,14 +17,14 @@ class dbt_cloud_job_vars:
     project_id: int
     job_id: int
     cause: str
-    single_tenant: str = "cloud"
+    tenant: str = "cloud"
     dbt_cloud_api_key: str = Variable.get(
         "dbt_cloud_api_key"
     )  # TODO: manually set this in the airflow variables UI 
 
     @property
     def dbt_cloud_url(self):
-        return f"https://{self.single_tenant}.getdbt.com"
+        return f"https://{self.tenant}.getdbt.com"
 
 
 @dataclass(frozen=True)
@@ -50,7 +50,7 @@ class dbt_cloud_job_runner(dbt_cloud_job_vars, dbt_job_run_status):
         project_id(int): dbt Cloud project id
         job_id(int): dbt Cloud job id
         cause(str): dbt Cloud cause(ex: name of DAG)
-        single_tenant(str): dbt Cloud single tenant subdomain(s) (optional)
+        tenant(str): dbt Cloud single tenant subdomain(s) (optional)
         dbt_cloud_api_key(str)(OPTIONAL): dbt Cloud api key to authorize programmatically interacting with dbt Cloud
     """
 
