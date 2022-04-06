@@ -94,7 +94,6 @@ dbt_cloud_job_runner_config = dbt_cloud_job_runner(
 
 ```
 
-
 Turn on the DAG:
 ![image](/images/turn_on_dag.png)
 
