@@ -17,14 +17,14 @@ class dbt_cloud_job_vars:
     project_id: int
     job_id: int
     cause: str
-    single_tenant: str = None
+    single_tenant: str = "cloud"
     dbt_cloud_api_key: str = Variable.get(
         "dbt_cloud_api_key"
     )  # TODO: manually set this in the airflow variables UI 
 
     @property
     def dbt_cloud_url(self):
-        return "https://cloud.getdbt.com" if self.single_tenant is None else f"https://{self.single_tenant}.getdbt.com"
+        return f"https://{self.single_tenant}.getdbt.com"
 
 
 @dataclass(frozen=True)
