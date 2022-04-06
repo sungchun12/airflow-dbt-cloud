@@ -8,8 +8,8 @@ from dbt_cloud_utils import dbt_cloud_job_runner
 dag_file_name = __file__
 
 # TODO: MANUALLY create a dbt Cloud job: https://docs.getdbt.com/docs/dbt-cloud/cloud-quickstart#create-a-new-job
-# Example dbt Cloud job URL
-# https://cloud.getdbt.com/#/accounts/4238/projects/12220/jobs/12389/
+# Example single tenant dbt Cloud job URL
+# https://staging.singletenant.getdbt.com/#/accounts/1/projects/195/jobs/35/
 # example dbt Cloud job config
 dbt_cloud_job_runner_config = dbt_cloud_job_runner(
     account_id=1, project_id=195, job_id=35, tenant="staging.singletenant", cause=dag_file_name
