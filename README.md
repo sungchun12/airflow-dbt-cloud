@@ -81,6 +81,8 @@ Add your dbt Cloud API token as an encrypted variable:
 
 Add your job config details to the python file: [dbt_cloud_example.py](/dags/dbt_cloud_example.py)
 
+> :exclamation: **If you are on a [Single Tenant](https://docs.getdbt.com/docs/dbt-cloud/deployments/deployment-overview) instance of dbt Cloud:** Add the optional parameter `tenant` with your single tenant subdomain(s) as demonstrated in [dbt_cloud_example_single_tenant.py](/dags/dbt_cloud_example_single_tenant.py).
+
 ```python
 # TODO: MANUALLY create a dbt Cloud job: https://docs.getdbt.com/docs/dbt-cloud/cloud-quickstart#create-a-new-job
 # Example dbt Cloud job URL
@@ -92,13 +94,6 @@ dbt_cloud_job_runner_config = dbt_cloud_job_runner(
 
 ```
 
-> :exclamation: **If you are on a [Single Tenant](https://docs.getdbt.com/docs/dbt-cloud/deployments/deployment-overview) instance of dbt Cloud:** Add the optional parameter `tenant` with your single tenant subdomain(s). For example:
-
-```
-dbt_cloud_job_runner_config = dbt_cloud_job_runner(
-    tenant = 'customer', account_id=19, project_id=37, job_id=28, cause=dag_file_name
-)
-```
 
 Turn on the DAG:
 ![image](/images/turn_on_dag.png)
