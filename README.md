@@ -2,6 +2,8 @@
 
 Examples of scheduling dbt Cloud pipelines in airflow. This is intended to be the simplest and fastest way to get locally started.
 
+TODO: replace all the below with a link to the official guide when ready
+
 ## Initial Setup
 
 1. Clone this repo: `git clone https://github.com/sungchun12/airflow-dbt-cloud.git`
@@ -15,7 +17,7 @@ Examples of scheduling dbt Cloud pipelines in airflow. This is intended to be th
 6. Run the following command to start a local airflow deployment:
 
 ```bash
-astro dev start
+astrocloud dev start
 # OUTPUT:
 # Env file ".env" found. Loading...
 # Sending build context to Docker daemon  31.23kB
@@ -48,24 +50,19 @@ Add your dbt Cloud API token as a secure connection:
 Add your `job_id` and `account_id` config details to the python file: [dbt_cloud_provider_example.py](/dags/dbt_cloud_provider_example.py)
 
 ```python
-# line 31
+# dbt Cloud Job URL: https://cloud.getdbt.com/#/accounts/16173/projects/36467/jobs/65767/
+# account_id: 16173
+# job_id: 65767
+
+# line 28
 default_args={"dbt_cloud_conn_id": "dbt_cloud", "account_id": 16173},
 
-# line 40
-trigger_job_run1 = DbtCloudRunJobOperator(
-    task_id="trigger_job_run1",
-    job_id=30605,
-    check_interval=10,
-    timeout=300,
-)
-
-# line 55
-trigger_job_run2 = DbtCloudRunJobOperator(
-    task_id="trigger_job_run2",
-    job_id=12345,
-    wait_for_termination=False,
-    additional_run_config={"threads_override": 8},
-)
+trigger_dbt_cloud_job_run = DbtCloudRunJobOperator(
+        task_id="trigger_dbt_cloud_job_run",
+        job_id=65767, # line 39
+        check_interval=10,
+        timeout=300,
+    )
 
 ```
 
