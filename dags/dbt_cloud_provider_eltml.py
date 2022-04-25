@@ -27,7 +27,7 @@ with DAG(
     dag_id="dbt_cloud_provider_eltml",
     default_args={"dbt_cloud_conn_id": "dbt_cloud", "account_id": 16173},
     start_date=datetime(2021, 1, 1),
-    schedule_interval="@once",
+    schedule_interval=None,
     catchup=False,
 ) as dag:
     extract = DummyOperator(task_id="extract")
