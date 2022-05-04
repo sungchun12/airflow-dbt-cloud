@@ -3,7 +3,9 @@ import json
 
 import requests
 from dataclasses import dataclass
-from airflow.models import Variable
+# from airflow.models import Variable
+
+
 
 # TODO: MANUALLY create a dbt Cloud job: https://docs.getdbt.com/docs/dbt-cloud/cloud-quickstart#create-a-new-job
 # Example dbt Cloud job URL
@@ -18,9 +20,7 @@ class dbt_cloud_job_vars:
     job_id: int
     cause: str
     tenant: str = "cloud"
-    dbt_cloud_api_key: str = Variable.get(
-        "dbt_cloud_api_key"
-    )  # TODO: manually set this in the airflow variables UI 
+    dbt_cloud_api_key: str = '<API TOKEN>'  # TODO: manually set this in the airflow variables UI 
 
     @property
     def dbt_cloud_url(self):
@@ -133,3 +133,9 @@ class dbt_cloud_job_runner(dbt_cloud_job_vars, dbt_job_run_status):
                 or job_run_status == dbt_job_run_status.CANCELLED
             ):
                 raise Exception(f"Failure! Visit URL: {visit_url}")
+
+dbt_cloud_job_runner_config = dbt_cloud_job_runner(
+    account_id=16173, project_id=36467, job_id=30605, cause='dag_file_name'
+)
+
+dbt_cloud_job_runner_config.run_job()
