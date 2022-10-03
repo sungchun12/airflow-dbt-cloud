@@ -1,1 +1,1 @@
-FROM quay.io/astronomer/ap-airflow:2.2.5-onbuild
+FROM quay.io/astronomer/astro-runtime:6.0.2
