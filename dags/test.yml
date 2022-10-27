@@ -1,0 +1,13 @@
+# dbt_contracts.yml
+# upstream-only config for illustration
+contracts-upstream:
+  core-only: # give the project a plain name to ref 
+  path: git repo OR local subfolder # example: "https://{{env_var('DBT_ENV_SECRET_GIT_CREDENTIAL')}}@github.com/dbt-labs/awesome_repo.git" OR ./models/core/
+  version: 0.2.0 # UPDATE THIS TO v0.2.0
+  models:
+    - ref('fct_orders')
+    - ref('dim_customers')
+  requirements: # these can be LESS strict compared to the upstream contract, but NEVER more
+    - tests
+    - '>5 run history' # I don't trusts data until it's been run a few times
+  api_private_key: 'jioq2hfj28338' # replace with env_var for security
