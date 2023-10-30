@@ -59,7 +59,7 @@ with dag:
     generate_and_insert_data = GenerateAndInsertRandomData(
         task_id='generate_and_insert_data',
         postgres_conn_id='postgres_default',
-        table_name='my_table_name',
+        table_name='airflow_demo_table',
         column_name='my_column_name',
     )
 
